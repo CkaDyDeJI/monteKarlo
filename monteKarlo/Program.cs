@@ -37,8 +37,8 @@ namespace monteKarlo
             for (int i = 0; i < 5; i++) {
                 insideCounter = 0;
                 for (int j = 0; j < Math.Pow (10, i + 3); j++) {
-                    randomX = minX_ + ToDouble(number.Next ( 0, 32767 )) / 32767 * (maxX_ - minX_);//minX_ * number.Next (ToInt32 ( minX_ ), ToInt32(maxX_));
-                    randomY = minY_ + ToDouble(number.Next(0, 32767)) / 32767 * (maxY_ - minY_);//number.Next (ToInt32 ( minY_ ), ToInt32(maxY_));
+                    randomX = minX_ + ToDouble(number.Next (0, 32767)) / 32767 * (maxX_ - minX_);//minX_ * number.Next (ToInt32 ( minX_ ), ToInt32(maxX_));
+                    randomY = minY_ + ToDouble(number.Next (0, 32767)) / 32767 * (maxY_ - minY_);//number.Next (ToInt32 ( minY_ ), ToInt32(maxY_));
                     if (BorderFunctions.isInside (new Point (randomX, randomY)) == true)
                         insideCounter++;
                 }
@@ -46,11 +46,13 @@ namespace monteKarlo
                 withSquares.Add (square_ * insideCounter / Math.Pow (10, i + 3));
             }
 
+            double actuallySquare = BorderFunctions.calculateActualSquare ( leftDownPoint_ );
+
             foreach (var withSquare in withSquares) {
-                Console.WriteLine(withSquare);
+                Console.WriteLine ($"{withSquare}, {(withSquare - actuallySquare) / actuallySquare * 100}%");
             }
 
-            double actuallySquare = BorderFunctions.calculateActualSquare (leftDownPoint_);
+            
             Console.WriteLine( $"xxxxx = {actuallySquare}");
             Console.ReadKey();
         }
