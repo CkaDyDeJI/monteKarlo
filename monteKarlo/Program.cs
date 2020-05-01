@@ -9,14 +9,10 @@ namespace monteKarlo
     using static System.Convert;
     class Program
     {
-        //private static Point leftDownPoint_;
-        //private static Point leftUPoint_;
-        //private static Point rightUPoint_;
-        //private static Point rightDowPoint_;
-
-        private static Point leftPoint_;
-        private static Point upPoint_;
-        private static Point rightPoint_;
+        private static Point leftDownPoint_;
+        private static Point leftUPoint_;
+        private static Point rightUPoint_;
+        private static Point rightDowPoint_;
 
         private static double minY_;
         private static double minX_;
@@ -31,8 +27,8 @@ namespace monteKarlo
         {
             inputDots();
 
-            BorderFunctions.calculateCircleCenter ( rightPoint_, upPoint_ );
-            BorderFunctions.calculateLinearCoeffs ( leftPoint_, upPoint_ );
+            BorderFunctions.calculateCircleCenter ( rightUPoint_, rightDowPoint_ );
+            BorderFunctions.calculateLinearCoeffs ( leftDownPoint_, new Point ( rightDowPoint_.X - (rightUPoint_.Y - rightDowPoint_.Y), rightUPoint_.Y ) );
 
             Random number = new Random ();
             int insideCounter;
@@ -54,7 +50,7 @@ namespace monteKarlo
                 Console.WriteLine(withSquare);
             }
 
-            double actuallySquare = BorderFunctions.calculateActualSquare (leftPoint_);
+            double actuallySquare = BorderFunctions.calculateActualSquare (leftDownPoint_);
             Console.WriteLine( $"xxxxx = {actuallySquare}");
             Console.ReadKey();
         }
@@ -63,30 +59,32 @@ namespace monteKarlo
         private static void inputDots ()
         {
             string[] temp = Console.ReadLine().Split (new char[] {' '});
-            leftPoint_ = new Point ( ToDouble ( temp[0]), ToDouble ( temp[1] ));
+            leftDownPoint_ = new Point ( ToDouble ( temp[0]), ToDouble ( temp[1] ));
             temp = Console.ReadLine().Split (new char[] { ' ' });
-            upPoint_ = new Point ( ToDouble ( temp[0] ), ToDouble ( temp[1]) );
+            leftUPoint_ = new Point ( ToDouble ( temp[0] ), ToDouble ( temp[1]) );
             temp = Console.ReadLine ().Split (new char[] { ' ' });
-            rightPoint_ = new Point ( ToDouble ( temp[0] ), ToDouble ( temp[1] ) );
-
-            setMinsAndMaxs();
+            rightUPoint_ = new Point ( ToDouble ( temp[0] ), ToDouble ( temp[1] ) );
+            temp = Console.ReadLine ().Split ( new char[] { ' ' } );
+            rightDowPoint_ = new Point ( ToDouble ( temp[0] ), ToDouble ( temp[1] ) );
 
             calculateSquare ();
+
+            setMinsAndMaxs();
         }
 
 
         private static void setMinsAndMaxs ()
         {
-            minX_ = leftPoint_.X;
-            minY_ = leftPoint_.Y;
-            maxX_ = rightPoint_.X;
-            maxY_ = upPoint_.Y;
+            minX_ = leftDownPoint_.X;
+            minY_ = leftDownPoint_.Y;
+            maxX_ = rightDowPoint_.X;
+            maxY_ = leftUPoint_.Y;
         }
 
 
         private static void calculateSquare ()
         {
-            square_ = (maxX_ - minX_) * (maxY_ - minY_);
+            square_ = (leftUPoint_.Y - leftDownPoint_.Y) * (rightDowPoint_.X - leftDownPoint_.X);
         }
     }
 }
