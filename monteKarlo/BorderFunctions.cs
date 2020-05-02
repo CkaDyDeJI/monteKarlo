@@ -10,8 +10,12 @@ namespace monteKarlo
     static class BorderFunctions
     {
         private static Circle centerCircle_;
-        private static double k_;
-        private static double b_;
+
+        private static double k1_;
+        private static double b1_;
+
+        private static double k2_;
+        private static double b2_;
         //private static double r_;
 
         private static int functionsIsCalculated = 0;
@@ -19,30 +23,37 @@ namespace monteKarlo
 
         public static bool isInside(Point newPoint)
         {
-            if (functionsIsCalculated != 2) {
+            if (functionsIsCalculated != 3) {
                 Console.WriteLine("stuff is not set!");
 
                 return false;
             }
 
-            if (newPoint.X < centerCircle_.X)
-                return isLowerlinearFunction (newPoint.X, newPoint.Y);
+            if (newPoint.X < centerCircle_.X) {
+                if ((isLowerlinearFunction (newPoint.X, newPoint.Y) == true) &&
+                    (isUpperlinearFunction (newPoint.X, newPoint.Y) == true))
+                    return true;
+                else
+                    return false;
+            }
             else
                 return isInsideCircle (newPoint.X, newPoint.Y);
         }
 
 
-        public static void calculateLinearCoeffs(Point firstPoint, Point secondPoint)
+        public static void calculateLinearCoeffsFirst (Point firstPoint, Point secondPoint)
         {
-            b_ = (secondPoint.Y * firstPoint.X - secondPoint.X * firstPoint.Y) / (-secondPoint.X + 1);
-            if ((firstPoint.X != 0 && firstPoint.Y != 0) || (firstPoint.X != 0))
-                k_ = (firstPoint.Y - b_) / firstPoint.X;
-            else {
-                if (firstPoint.Y != 0)
-                    k_ = (firstPoint.Y - b_);
-                else
-                    k_ = 1;
-            }
+            k1_ = (secondPoint.Y - firstPoint.Y) / (secondPoint.X - firstPoint.X);
+            b1_ = firstPoint.Y - k1_ * firstPoint.X;
+
+            functionsIsCalculated++;
+        }
+
+
+        public static void calculateLinearCoeffsSecond (Point firstPoint, Point secondPoint)
+        {
+            k2_ = (secondPoint.Y - firstPoint.Y) / (secondPoint.X - firstPoint.X);
+            b2_ = firstPoint.Y - k2_ * firstPoint.X;
 
             functionsIsCalculated++;
         }
@@ -50,7 +61,13 @@ namespace monteKarlo
 
         private static bool isLowerlinearFunction(double x, double y)
         {
-            return (y < (k_ * x + b_)) ? true : false;
+            return (y < (k1_ * x + b1_)) ? true : false;
+        }
+
+
+        private static bool isUpperlinearFunction (double x, double y)
+        {
+            return (y > (k2_ * x + b2_)) ? true : false;
         }
 
 
@@ -64,14 +81,17 @@ namespace monteKarlo
 
         private static bool isInsideCircle(double x, double y)
         {
-            return ((Math.Sqrt (x * x + y * y) - centerCircle_.X) < centerCircle_.Radius) ? true : false;
+            return ((Math.Sqrt ((x - centerCircle_.X) * (x - centerCircle_.X) + y * y)) <= centerCircle_.Radius) ? true : false;
         }
 
 
-        public static double calculateActualSquare (Point leftDown)
+        public static double calculateActualSquare (Point left, Point up, Point down)
         {
-            return ((centerCircle_.X - leftDown.X) * centerCircle_.Radius / 2) +
-                   (Math.PI * centerCircle_.Radius * centerCircle_.Radius / 4);
+            return (centerCircle_.X - left.X) * (up.Y - down.Y) - ((up.Y - left.Y) * (up.X - left.X) * 0.5) -
+                ((down.X - left.X) * (left.Y - down.Y) * 0.5) + (Math.PI * centerCircle_.Radius * centerCircle_.Radius / 4);
+
+            //return ((centerCircle_.X - leftDown.X) * centerCircle_.Radius / 2) +
+            //       (Math.PI * centerCircle_.Radius * centerCircle_.Radius / 4);
         }
     }
 }
