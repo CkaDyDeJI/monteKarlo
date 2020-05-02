@@ -34,15 +34,8 @@ namespace monteKarlo
 
         public static void calculateLinearCoeffs(Point firstPoint, Point secondPoint)
         {
-            b_ = (secondPoint.Y * firstPoint.X - secondPoint.X * firstPoint.Y) / (-secondPoint.X + 1);
-            if ((firstPoint.X != 0 && firstPoint.Y != 0) || (firstPoint.X != 0))
-                k_ = (firstPoint.Y - b_) / firstPoint.X;
-            else {
-                if (firstPoint.Y != 0)
-                    k_ = (firstPoint.Y - b_);
-                else
-                    k_ = 1;
-            }
+            k_ = (secondPoint.Y - firstPoint.Y) / (secondPoint.X - firstPoint.X);
+            b_ = firstPoint.Y - k_ * firstPoint.X;
 
             functionsIsCalculated++;
         }
@@ -64,7 +57,7 @@ namespace monteKarlo
 
         private static bool isInsideCircle(double x, double y)
         {
-            return ((Math.Sqrt (x * x + y * y) - centerCircle_.X) < centerCircle_.Radius) ? true : false;
+            return ((Math.Sqrt ( (x - centerCircle_.X) * (x - centerCircle_.X) + y * y )) <= centerCircle_.Radius) ? true : false;
         }
 
 
