@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 
 
 namespace monteKarlo
@@ -7,82 +8,191 @@ namespace monteKarlo
     using static Convert;
 
 
-    internal class Program
+    struct forPoints
     {
-        //private static Point leftDownPoint_;
-        //private static Point leftUPoint_;
-        //private static Point rightUPoint_;
-        //private static Point rightDowPoint_;
-
-        private static Point leftPoint_;
-        private static Point upPoint_;
-        private static Point downPoint_;
-        private static Point rightPoint_;
-
-        private static double minY_;
-        private static double minX_;
-        private static double maxY_;
-        private static double maxX_;
-
-        private static double square_;
-
-        private static readonly List <double> withSquares = new List <double>();
+        public static Point leftPoint_;
+        public static Point upPoint_;
+        public static Point downPoint_;
+        public static Point rightPoint_;
+    }
 
 
+    class Program
+    {
         private static void Main (string[] args)
         {
             inputDots();
 
-            BorderFunctions.calculateCircleCenter (rightPoint_, upPoint_);
-            BorderFunctions.calculateLinearCoeffsFirst (leftPoint_, upPoint_);
-            BorderFunctions.calculateLinearCoeffsSecond (leftPoint_, downPoint_);
+            forOOP temp = new forOOP ();
+            var firstStuff = temp.doStuff ();
 
-            var number = new Random();
-            int insideCounter;
-            double randomX;
-            double randomY;
-            for (var i = 0; i < 5; i++) {
-                double n = Math.Pow (10, i + 3);
+            forNonOOP temp2 = new forNonOOP();
+            var secondStuff = temp2.doStuff();
 
-                insideCounter = 0;
-                for (var j = 0; j < n; j++) {
-                    randomX = minX_ + ToDouble (number.Next (0, 132767)) / 132767 * (maxX_ - minX_); //minX_ * number.Next (ToInt32 ( minX_ ), ToInt32(maxX_));
-                    randomY = minY_ + ToDouble (number.Next (0, 132767)) / 132767 * (maxY_ - minY_); //number.Next (ToInt32 ( minY_ ), ToInt32(maxY_));
-                    if (BorderFunctions.isInside (new Point (randomX, randomY)))
-                        insideCounter++;
-                }
+            if (firstStuff < secondStuff)
+                Console.WriteLine ( "oop is faster" );
+            else
+                Console.WriteLine ( "nonoop is faster" );
 
-                withSquares.Add (square_ * insideCounter / n);
-            }
-
-            var actuallySquare = BorderFunctions.calculateActualSquare (leftPoint_, upPoint_, downPoint_);
-
-            foreach (var withSquare in withSquares)
-                Console.WriteLine ($"{withSquare}, {(withSquare - actuallySquare) / actuallySquare}%");
-
-            Console.WriteLine ($"xxxxx = {actuallySquare}");
             Console.ReadKey();
         }
 
 
-        private static void inputDots()
+        private static void inputDots ()
         {
-            var temp = Console.ReadLine().Split (' ');
-            leftPoint_ = new Point (ToDouble (temp[0]), ToDouble (temp[1]));
-            temp = Console.ReadLine().Split (' ');
-            upPoint_ = new Point (ToDouble (temp[0]), ToDouble (temp[1]));
-            temp = Console.ReadLine().Split (' ');
-            rightPoint_ = new Point (ToDouble (temp[0]), ToDouble (temp[1]));
-            temp = Console.ReadLine().Split (  ' ');
-            downPoint_ = new Point (ToDouble (temp[0]), ToDouble (temp[1]));
+            Console.Write ( "enter left point: " );
+            var temp = Console.ReadLine ().Split ( ' ' );
+            forPoints.leftPoint_ = new Point ( ToDouble ( temp[0] ), ToDouble ( temp[1] ) );
 
-            setMinsAndMaxs();
+            Console.Write ( "enter up point: " );
+            temp = Console.ReadLine ().Split ( ' ' );
+            forPoints.upPoint_ = new Point ( ToDouble ( temp[0] ), ToDouble ( temp[1] ) );
 
-            calculateSquare();
+            Console.Write ( "enter right point: " );
+            temp = Console.ReadLine ().Split ( ' ' );
+            forPoints.rightPoint_ = new Point ( ToDouble ( temp[0] ), ToDouble ( temp[1] ) );
+
+            Console.Write ( "enter down point: " );
+            temp = Console.ReadLine ().Split ( ' ' );
+            forPoints.downPoint_ = new Point ( ToDouble ( temp[0] ), ToDouble ( temp[1] ) );
+        }
+    }
+
+
+    class forOOP
+    {
+        private readonly List<double> withSquares = new List<double> ();
+        private Figure mainFigure_;
+
+        public TimeSpan doStuff()
+        {
+            mainFigure_ = new Figure ( forPoints.leftPoint_, forPoints.upPoint_, forPoints.rightPoint_, forPoints.downPoint_ );
+
+            Stopwatch watch = new Stopwatch ();
+            watch.Start ();
+
+            var number = new Random ();
+            int insideCounter;
+            double randomX;
+            double randomY;
+            for (var i = 0; i < 5; i++)
+            {
+                double n = Math.Pow ( 10, i + 3 );
+
+                insideCounter = 0;
+                for (var j = 0; j < n; j++)
+                {
+                    randomX = mainFigure_.minX_ + ToDouble ( number.Next ( 0, 132767 ) ) / 132767 * (mainFigure_.maxX_ - mainFigure_.minX_); //minX_ * number.Next (ToInt32 ( minX_ ), ToInt32(maxX_));
+                    randomY = mainFigure_.minY_ + ToDouble ( number.Next ( 0, 132767 ) ) / 132767 * (mainFigure_.maxY_ - mainFigure_.minY_); //number.Next (ToInt32 ( minY_ ), ToInt32(maxY_));
+                    if (BorderFunctions.isInside ( new Point ( randomX, randomY ) ))
+                        insideCounter++;
+                }
+
+                withSquares.Add ( mainFigure_.square_ * insideCounter / n );
+            }
+
+            var actuallySquare = BorderFunctions.calculateActualSquare ( mainFigure_.leftPoint_, mainFigure_.upPoint_, mainFigure_.downPoint_ );
+            watch.Stop ();
+
+            foreach (var withSquare in withSquares)
+                Console.WriteLine ( $"monte-carlo square = {withSquare}, infelicity = { Math.Abs ( withSquare - actuallySquare ) / actuallySquare}%" );
+
+            //TimeSpan span = watch.Elapsed;
+
+            Console.WriteLine ( $"correct square = {actuallySquare}" );
+            Console.WriteLine ( $"time consumed = {watch.Elapsed}\n\r\n\r" );
+
+            return watch.Elapsed;
+        }
+    }
+
+
+    class forNonOOP
+    {
+        private readonly List<double> withSquares = new List<double> ();
+
+        private Circle centerCircle_;
+
+        private double k1_;
+        private double b1_;
+
+        private double k2_;
+        private double b2_;
+
+        private int functionsIsCalculated = 0;
+
+        private Point leftPoint_;
+        private Point upPoint_;
+        private Point downPoint_;
+        private Point rightPoint_;
+
+        private double minY_;
+        private double minX_;
+        private double maxY_;
+        private double maxX_;
+
+        public double square_;
+
+        public TimeSpan doStuff ()
+        {
+            setStuff ( forPoints.leftPoint_, forPoints.upPoint_, forPoints.rightPoint_, forPoints.downPoint_ );
+
+            Stopwatch watch = new Stopwatch ();
+            watch.Start ();
+
+            var number = new Random ();
+            int insideCounter;
+            double randomX;
+            double randomY;
+            for (var i = 0; i < 5; i++)
+            {
+                double n = Math.Pow ( 10, i + 3 );
+
+                insideCounter = 0;
+                for (var j = 0; j < n; j++)
+                {
+                    randomX = minX_ + ToDouble ( number.Next ( 0, 132767 ) ) / 132767 * (maxX_ - minX_); //minX_ * number.Next (ToInt32 ( minX_ ), ToInt32(maxX_));
+                    randomY = minY_ + ToDouble ( number.Next ( 0, 132767 ) ) / 132767 * (maxY_ - minY_); //number.Next (ToInt32 ( minY_ ), ToInt32(maxY_));
+                    if (isInside ( new Point ( randomX, randomY ) ))
+                        insideCounter++;
+                }
+
+                withSquares.Add ( square_ * insideCounter / n );
+            }
+
+            var actuallySquare = calculateActualSquare ( leftPoint_, upPoint_, downPoint_ );
+            watch.Stop ();
+
+            foreach (var withSquare in withSquares)
+                Console.WriteLine ( $"monte-carlo square = {withSquare}, infelicity = { Math.Abs ( withSquare - actuallySquare ) / actuallySquare}%" );
+
+            //TimeSpan span = watch.Elapsed;
+
+            Console.WriteLine ( $"correct square = {actuallySquare}" );
+            Console.WriteLine ( $"time consumed = {watch.Elapsed}\n\r\n\r" );
+
+            return watch.Elapsed;
         }
 
 
-        private static void setMinsAndMaxs()
+        private void setStuff (Point leftPoint, Point upPoint, Point rightPoint, Point downPoint)
+        {
+            leftPoint_ = leftPoint;
+            upPoint_ = upPoint;
+            rightPoint_ = rightPoint;
+            downPoint_ = downPoint;
+
+            setMinsAndMaxs ();
+
+            calculateSquare ();
+
+            calculateCircleCenter ( rightPoint_, upPoint_ );
+            calculateLinearCoeffsFirst ( leftPoint_, upPoint_ );
+            calculateLinearCoeffsSecond ( leftPoint_, downPoint_ );
+        }
+
+
+        private void setMinsAndMaxs ()
         {
             minX_ = leftPoint_.X;
             minY_ = downPoint_.Y;
@@ -91,9 +201,84 @@ namespace monteKarlo
         }
 
 
-        private static void calculateSquare()
+        private void calculateSquare ()
         {
             square_ = (maxX_ - minX_) * (maxY_ - minY_);
+        }
+
+
+        public bool isInside (Point newPoint)
+        {
+            if (functionsIsCalculated != 3)
+            {
+                Console.WriteLine ( "stuff is not set!" );
+
+                return false;
+            }
+
+            if (newPoint.X < centerCircle_.X)
+            {
+                if ((isLowerlinearFunction ( newPoint.X, newPoint.Y ) == true) &&
+                    (isUpperlinearFunction ( newPoint.X, newPoint.Y ) == true))
+                    return true;
+                else
+                    return false;
+            } else
+                return isInsideCircle ( newPoint.X, newPoint.Y );
+        }
+
+
+        public void calculateLinearCoeffsFirst (Point firstPoint, Point secondPoint)
+        {
+            k1_ = (secondPoint.Y - firstPoint.Y) / (secondPoint.X - firstPoint.X);
+            b1_ = firstPoint.Y - k1_ * firstPoint.X;
+
+            functionsIsCalculated++;
+        }
+
+
+        public void calculateLinearCoeffsSecond (Point firstPoint, Point secondPoint)
+        {
+            k2_ = (secondPoint.Y - firstPoint.Y) / (secondPoint.X - firstPoint.X);
+            b2_ = firstPoint.Y - k2_ * firstPoint.X;
+
+            functionsIsCalculated++;
+        }
+
+
+        private bool isLowerlinearFunction (double x, double y)
+        {
+            return (y < (k1_ * x + b1_)) ? true : false;
+        }
+
+
+        private bool isUpperlinearFunction (double x, double y)
+        {
+            return (y > (k2_ * x + b2_)) ? true : false;
+        }
+
+
+        public void calculateCircleCenter (Point cPoint, Point dPoint)
+        {
+            centerCircle_ = new Circle ( new Point ( dPoint.X, cPoint.Y ), cPoint.X - dPoint.X );
+
+            functionsIsCalculated++;
+        }
+
+
+        private bool isInsideCircle (double x, double y)
+        {
+            return ((Math.Sqrt ( (x - centerCircle_.X) * (x - centerCircle_.X) + y * y )) <= centerCircle_.Radius) ? true : false;
+        }
+
+
+        public double calculateActualSquare (Point left, Point up, Point down)
+        {
+            return (centerCircle_.X - left.X) * (up.Y - down.Y) - ((up.Y - left.Y) * (up.X - left.X) * 0.5) -
+                ((down.X - left.X) * (left.Y - down.Y) * 0.5) + (Math.PI * centerCircle_.Radius * centerCircle_.Radius / 4);
+
+            //return ((centerCircle_.X - leftDown.X) * centerCircle_.Radius / 2) +
+            //       (Math.PI * centerCircle_.Radius * centerCircle_.Radius / 4);
         }
     }
 }

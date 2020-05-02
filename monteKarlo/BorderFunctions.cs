@@ -73,7 +73,7 @@ namespace monteKarlo
 
         public static void calculateCircleCenter(Point cPoint, Point dPoint)
         {
-            centerCircle_ = new Circle (new Point ( cPoint.X - dPoint.X, cPoint.Y), cPoint.X - dPoint.X );
+            centerCircle_ = new Circle (new Point (dPoint.X, cPoint.Y), cPoint.X - dPoint.X );
 
             functionsIsCalculated++;
         }
