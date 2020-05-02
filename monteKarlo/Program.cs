@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
@@ -31,6 +32,9 @@ namespace monteKarlo
         {
             inputDots();
 
+            Stopwatch watch = new Stopwatch();
+            watch.Start();
+
             BorderFunctions.calculateCircleCenter ( rightPoint_, upPoint_ );
             BorderFunctions.calculateLinearCoeffs ( leftPoint_, upPoint_ );
 
@@ -50,12 +54,15 @@ namespace monteKarlo
                 withSquares.Add (square_ * insideCounter / Math.Pow (10, i + 3));
             }
 
+            watch.Stop();
+
             foreach (var withSquare in withSquares) {
                 Console.WriteLine(withSquare);
             }
 
             double actuallySquare = BorderFunctions.calculateActualSquare (leftPoint_);
             Console.WriteLine( $"xxxxx = {actuallySquare}");
+            Console.WriteLine($"{watch.Elapsed.Seconds}, {watch.Elapsed.Milliseconds}");
             Console.ReadKey();
         }
 
