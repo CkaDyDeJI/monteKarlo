@@ -12,7 +12,7 @@ namespace monteKarlo
     {
         public static Point leftPoint_;
         public static Point upPoint_;
-        public static Point downPoint_;
+        //public static Point downPoint_;
         public static Point rightPoint_;
     }
 
@@ -52,9 +52,9 @@ namespace monteKarlo
             temp = Console.ReadLine ().Split ( ' ' );
             forPoints.rightPoint_ = new Point ( ToDouble ( temp[0] ), ToDouble ( temp[1] ) );
 
-            Console.Write ( "enter down point: " );
-            temp = Console.ReadLine ().Split ( ' ' );
-            forPoints.downPoint_ = new Point ( ToDouble ( temp[0] ), ToDouble ( temp[1] ) );
+            //Console.Write ( "enter down point: " );
+            //temp = Console.ReadLine ().Split ( ' ' );
+            //forPoints.downPoint_ = new Point ( ToDouble ( temp[0] ), ToDouble ( temp[1] ) );
         }
     }
 
@@ -66,7 +66,7 @@ namespace monteKarlo
 
         public TimeSpan doStuff()
         {
-            mainFigure_ = new Figure ( forPoints.leftPoint_, forPoints.upPoint_, forPoints.rightPoint_, forPoints.downPoint_ );
+            mainFigure_ = new Figure ( forPoints.leftPoint_, forPoints.upPoint_, forPoints.rightPoint_ );
 
             Stopwatch watch = new Stopwatch ();
             watch.Start ();
@@ -91,7 +91,7 @@ namespace monteKarlo
                 withSquares.Add ( mainFigure_.square_ * insideCounter / n );
             }
 
-            var actuallySquare = BorderFunctions.calculateActualSquare ( mainFigure_.leftPoint_, mainFigure_.upPoint_, mainFigure_.downPoint_ );
+            var actuallySquare = BorderFunctions.calculateActualSquare (mainFigure_.leftPoint_);
             watch.Stop ();
 
             foreach (var withSquare in withSquares)
@@ -113,29 +113,28 @@ namespace monteKarlo
 
         private Circle centerCircle_;
 
-        private double k1_;
-        private double b1_;
+        private double k_;
+        private double b_;
 
-        private double k2_;
-        private double b2_;
+        //private double k2_;
+        //private double b2_;
 
         private int functionsIsCalculated = 0;
 
-        private Point leftPoint_;
-        private Point upPoint_;
-        private Point downPoint_;
-        private Point rightPoint_;
+        private Point leftPoint_ = forPoints.leftPoint_;
+        private Point upPoint_ = forPoints.upPoint_;
+        private Point rightPoint_ = forPoints.rightPoint_;
 
         private double minY_;
         private double minX_;
         private double maxY_;
         private double maxX_;
 
-        public double square_;
+        private double square_;
 
         public TimeSpan doStuff ()
         {
-            setStuff ( forPoints.leftPoint_, forPoints.upPoint_, forPoints.rightPoint_, forPoints.downPoint_ );
+            setStuff ();
 
             Stopwatch watch = new Stopwatch ();
             watch.Start ();
@@ -160,7 +159,7 @@ namespace monteKarlo
                 withSquares.Add ( square_ * insideCounter / n );
             }
 
-            var actuallySquare = calculateActualSquare ( leftPoint_, upPoint_, downPoint_ );
+            var actuallySquare = calculateActualSquare ( leftPoint_);
             watch.Stop ();
 
             foreach (var withSquare in withSquares)
@@ -175,27 +174,22 @@ namespace monteKarlo
         }
 
 
-        private void setStuff (Point leftPoint, Point upPoint, Point rightPoint, Point downPoint)
+        private void setStuff ()
         {
-            leftPoint_ = leftPoint;
-            upPoint_ = upPoint;
-            rightPoint_ = rightPoint;
-            downPoint_ = downPoint;
-
             setMinsAndMaxs ();
 
             calculateSquare ();
 
             calculateCircleCenter ( rightPoint_, upPoint_ );
-            calculateLinearCoeffsFirst ( leftPoint_, upPoint_ );
-            calculateLinearCoeffsSecond ( leftPoint_, downPoint_ );
+            calculateLinearCoeffs ( leftPoint_, upPoint_ );
+            //calculateLinearCoeffsSecond ( leftPoint_, downPoint_ );
         }
 
 
         private void setMinsAndMaxs ()
         {
             minX_ = leftPoint_.X;
-            minY_ = downPoint_.Y;
+            minY_ = leftPoint_.Y;
             maxX_ = rightPoint_.X;
             maxY_ = upPoint_.Y;
         }
@@ -209,7 +203,7 @@ namespace monteKarlo
 
         public bool isInside (Point newPoint)
         {
-            if (functionsIsCalculated != 3)
+            if (functionsIsCalculated != 2)
             {
                 Console.WriteLine ( "stuff is not set!" );
 
@@ -218,8 +212,7 @@ namespace monteKarlo
 
             if (newPoint.X < centerCircle_.X)
             {
-                if ((isLowerlinearFunction ( newPoint.X, newPoint.Y ) == true) &&
-                    (isUpperlinearFunction ( newPoint.X, newPoint.Y ) == true))
+                if (isLowerlinearFunction ( newPoint.X, newPoint.Y ) == true)
                     return true;
                 else
                     return false;
@@ -228,34 +221,34 @@ namespace monteKarlo
         }
 
 
-        public void calculateLinearCoeffsFirst (Point firstPoint, Point secondPoint)
+        public void calculateLinearCoeffs (Point firstPoint, Point secondPoint)
         {
-            k1_ = (secondPoint.Y - firstPoint.Y) / (secondPoint.X - firstPoint.X);
-            b1_ = firstPoint.Y - k1_ * firstPoint.X;
+            k_ = (secondPoint.Y - firstPoint.Y) / (secondPoint.X - firstPoint.X);
+            b_ = firstPoint.Y - k_ * firstPoint.X;
 
             functionsIsCalculated++;
         }
 
 
-        public void calculateLinearCoeffsSecond (Point firstPoint, Point secondPoint)
-        {
-            k2_ = (secondPoint.Y - firstPoint.Y) / (secondPoint.X - firstPoint.X);
-            b2_ = firstPoint.Y - k2_ * firstPoint.X;
+        //public void calculateLinearCoeffsSecond (Point firstPoint, Point secondPoint)
+        //{
+        //    k2_ = (secondPoint.Y - firstPoint.Y) / (secondPoint.X - firstPoint.X);
+        //    b2_ = firstPoint.Y - k2_ * firstPoint.X;
 
-            functionsIsCalculated++;
-        }
+        //    functionsIsCalculated++;
+        //}
 
 
         private bool isLowerlinearFunction (double x, double y)
         {
-            return (y < (k1_ * x + b1_)) ? true : false;
+            return (y < (k_ * x + b_)) ? true : false;
         }
 
 
-        private bool isUpperlinearFunction (double x, double y)
-        {
-            return (y > (k2_ * x + b2_)) ? true : false;
-        }
+        //private bool isUpperlinearFunction (double x, double y)
+        //{
+        //    return (y > (k2_ * x + b2_)) ? true : false;
+        //}
 
 
         public void calculateCircleCenter (Point cPoint, Point dPoint)
@@ -272,13 +265,13 @@ namespace monteKarlo
         }
 
 
-        public double calculateActualSquare (Point left, Point up, Point down)
+        public double calculateActualSquare (Point left)
         {
-            return (centerCircle_.X - left.X) * (up.Y - down.Y) - ((up.Y - left.Y) * (up.X - left.X) * 0.5) -
-                ((down.X - left.X) * (left.Y - down.Y) * 0.5) + (Math.PI * centerCircle_.Radius * centerCircle_.Radius / 4);
+            //return (centerCircle_.X - left.X) * (up.Y - down.Y) - ((up.Y - left.Y) * (up.X - left.X) * 0.5) -
+            //    ((down.X - left.X) * (left.Y - down.Y) * 0.5) + (Math.PI * centerCircle_.Radius * centerCircle_.Radius / 4);
 
-            //return ((centerCircle_.X - leftDown.X) * centerCircle_.Radius / 2) +
-            //       (Math.PI * centerCircle_.Radius * centerCircle_.Radius / 4);
+            return ((centerCircle_.X - left.X) * centerCircle_.Radius / 2) +
+                   (Math.PI * centerCircle_.Radius * centerCircle_.Radius / 4);
         }
     }
 }
