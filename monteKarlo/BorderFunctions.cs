@@ -14,65 +14,45 @@ namespace monteKarlo
         private static double k_;
         private static double b_;
 
-        //private static double k2_;
-        //private static double b2_;
-        //private static double r_;
-
         private static int functionsIsCalculated = 0;
 
 
-        public static bool isInside(Point newPoint)
+        public static int isInside(Point newPoint) //проверка того, внутри ли находится точка
         {
-            if (functionsIsCalculated != 2) {
-                Console.WriteLine("stuff is not set!");
+            if (functionsIsCalculated != 2) {   //если линейная фунция и фунция окружности не заданы, возврат фолса
 
-                return false;
+                return -1;
             }
 
-            if (newPoint.X < centerCircle_.X) {
+            if (newPoint.X < centerCircle_.X) { //проверка находится ли внутри треугольника, который слева от верхней точки
                 if (isLowerlinearFunction (newPoint.X, newPoint.Y) == true)
-                    return true;
+                    return 1;
                 else
-                    return false;
+                    return 0;
             }
             else
-                return isInsideCircle (newPoint.X, newPoint.Y);
+                return Convert.ToInt32(isInsideCircle (newPoint.X, newPoint.Y));    //находится ли внутри четверти окружности
         }
 
 
         public static void calculateLinearCoeffs (Point firstPoint, Point secondPoint)
         {
-            k_ = (secondPoint.Y - firstPoint.Y) / (secondPoint.X - firstPoint.X);
+            k_ = (secondPoint.Y - firstPoint.Y) / (secondPoint.X - firstPoint.X);   //коэффициенты линейной функции, чтобы проверять, находится ли внутри треугольника
             b_ = firstPoint.Y - k_ * firstPoint.X;
 
             functionsIsCalculated++;
         }
 
 
-        //public static void calculateLinearCoeffsSecond (Point firstPoint, Point secondPoint)
-        //{
-        //    k2_ = (secondPoint.Y - firstPoint.Y) / (secondPoint.X - firstPoint.X);
-        //    b2_ = firstPoint.Y - k2_ * firstPoint.X;
-
-        //    functionsIsCalculated++;
-        //}
-
-
         private static bool isLowerlinearFunction(double x, double y)
         {
-            return (y < (k_ * x + b_)) ? true : false;
+            return (y < (k_ * x + b_)) ? true : false;  //проверка находится ли внутри треугольника, который слева от верхней точки
         }
-
-
-        //private static bool isUpperlinearFunction (double x, double y)
-        //{
-        //    return (y > (k2_ * x + b2_)) ? true : false;
-        //}
 
 
         public static void calculateCircleCenter(Point cPoint, Point dPoint)
         {
-            centerCircle_ = new Circle (new Point (dPoint.X, cPoint.Y), cPoint.X - dPoint.X );
+            centerCircle_ = new Circle (new Point (dPoint.X, cPoint.Y), cPoint.X - dPoint.X );  //инициализация параметров круга
 
             functionsIsCalculated++;
         }
@@ -80,17 +60,15 @@ namespace monteKarlo
 
         private static bool isInsideCircle(double x, double y)
         {
-            return ((Math.Sqrt ((x - centerCircle_.X) * (x - centerCircle_.X) + y * y)) <= centerCircle_.Radius) ? true : false;
+            return ((Math.Sqrt ((x - centerCircle_.X) * (x - centerCircle_.X) + y * y)) <= centerCircle_.Radius) ? true : false;    //внутри ли круга
         }
 
 
         public static double calculateActualSquare (Point left)
         {
-            //return (centerCircle_.X - left.X) * (up.Y - down.Y) - ((up.Y - left.Y) * (up.X - left.X) * 0.5) -
-            //    ((down.X - left.X) * (left.Y - down.Y) * 0.5) + (Math.PI * centerCircle_.Radius * centerCircle_.Radius / 4);
 
             return ((centerCircle_.X - left.X) * centerCircle_.Radius / 2) +
-                   (Math.PI * centerCircle_.Radius * centerCircle_.Radius / 4);
+                   (Math.PI * centerCircle_.Radius * centerCircle_.Radius / 4); //нахождение настоящей площади
         }
     }
 }

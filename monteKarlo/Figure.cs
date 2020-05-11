@@ -18,7 +18,7 @@ namespace monteKarlo
         public double maxY_ { get; set; }
         public double maxX_ { get; set; }
 
-        public double square_ { get; set; }
+        public double square_ { get; set; } //площадь изначального прямоугольника
 
 
         public Figure(Point leftPoint, Point upPoint, Point rightPoint)
@@ -31,9 +31,8 @@ namespace monteKarlo
 
             calculateSquare ();
 
-            BorderFunctions.calculateCircleCenter ( rightPoint_, upPoint_ );
-            BorderFunctions.calculateLinearCoeffs ( leftPoint_, upPoint_ );
-            //BorderFunctions.calculateLinearCoeffsSecond ( leftPoint_, downPoint_ );
+            BorderFunctions.calculateCircleCenter ( rightPoint_, upPoint_ );    //вычисление линейной фунции по двум точкам
+            BorderFunctions.calculateLinearCoeffs ( leftPoint_, upPoint_ ); //вычисление функции окружности по двум точкам
         }
 
 

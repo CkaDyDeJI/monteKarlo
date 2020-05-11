@@ -8,7 +8,7 @@ namespace monteKarlo
     using static Convert;
 
 
-    struct forPoints
+    struct forPoints    //точки a, e и d
     {
         public static Point leftPoint_;
         public static Point upPoint_;
@@ -20,15 +20,15 @@ namespace monteKarlo
     {
         private static void Main (string[] args)
         {
-            inputDots();
+            inputDots();    //ввод точек для вычисления штук
 
             forOOP temp = new forOOP ();
-            var firstStuff = temp.doStuff ();
+            var firstStuff = temp.doStuff ();   //вычисление времени на вычисление площади методом монте карло с ооп
 
             forNonOOP temp2 = new forNonOOP();
-            var secondStuff = temp2.doStuff();
+            var secondStuff = temp2.doStuff();  //вычисление времени на вычисление площади методом монте карло процедурно
 
-            if (firstStuff < secondStuff)
+            if (firstStuff < secondStuff)   //вывод того метода, который быстрее
                 Console.WriteLine ( "oop is faster" );
             else
                 Console.WriteLine ( "nonoop is faster" );
@@ -39,15 +39,15 @@ namespace monteKarlo
 
         private static void inputDots ()
         {
-            Console.Write ( "enter left point: " );
+            Console.Write ( "enter left point: " ); //ввод координат левой точки через пробел
             var temp = Console.ReadLine ().Split ( ' ' );
             forPoints.leftPoint_ = new Point ( ToDouble ( temp[0] ), ToDouble ( temp[1] ) );
 
-            Console.Write ( "enter up point: " );
+            Console.Write ( "enter up point: " );   //ввод координат верхней точки через пробел
             temp = Console.ReadLine ().Split ( ' ' );
             forPoints.upPoint_ = new Point ( ToDouble ( temp[0] ), ToDouble ( temp[1] ) );
 
-            Console.Write ( "enter right point: " );
+            Console.Write ( "enter right point: " );    //ввод координат правой точки через пробел
             temp = Console.ReadLine ().Split ( ' ' );
             forPoints.rightPoint_ = new Point ( ToDouble ( temp[0] ), ToDouble ( temp[1] ) );
         }
@@ -56,52 +56,64 @@ namespace monteKarlo
 
     class forOOP
     {
-        private readonly List<double> withSquares = new List<double> ();
-        private Figure mainFigure_;
+        private readonly List<double> withSquares = new List<double> ();    //мы находим площадь 5 раза через метод монте карло и записываем эти площади в лист
+        private Figure mainFigure_; //класс основной фигуры
 
         public TimeSpan doStuff()
         {
-            mainFigure_ = new Figure ( forPoints.leftPoint_, forPoints.upPoint_, forPoints.rightPoint_ );
+            mainFigure_ = new Figure ( forPoints.leftPoint_, forPoints.upPoint_, forPoints.rightPoint_ );   //инициализуем ее
 
             Stopwatch watch = new Stopwatch ();
-            watch.Start ();
+            watch.Start (); //запуск таймера
 
             var number = new Random ();
             int insideCounter;
             double randomX;
             double randomY;
+            int temp;
             for (var i = 0; i < 5; i++)
             {
-                double n = Math.Pow ( 10, i + 3 );
+                double n = Math.Pow ( 10, i + 3 );  //указание n, которая у нас во входных данных
 
                 insideCounter = 0;
                 for (var j = 0; j < n; j++)
                 {
-                    randomX = mainFigure_.minX_ + ToDouble ( number.Next ( 0, 132767 ) ) / 132767 * (mainFigure_.maxX_ - mainFigure_.minX_); //minX_ * number.Next (ToInt32 ( minX_ ), ToInt32(maxX_));
-                    randomY = mainFigure_.minY_ + ToDouble ( number.Next ( 0, 132767 ) ) / 132767 * (mainFigure_.maxY_ - mainFigure_.minY_); //number.Next (ToInt32 ( minY_ ), ToInt32(maxY_));
-                    if (BorderFunctions.isInside ( new Point ( randomX, randomY ) ))
+                    randomX = mainFigure_.minX_ + ToDouble ( number.Next ( 0, 132767 ) ) / 132767 * (mainFigure_.maxX_ - mainFigure_.minX_);    //рандомная координата х
+                    randomY = mainFigure_.minY_ + ToDouble ( number.Next ( 0, 132767 ) ) / 132767 * (mainFigure_.maxY_ - mainFigure_.minY_);    //рандомная координата у
+
+                    temp = BorderFunctions.isInside (new Point (randomX, randomY)); //проверка внутри ли
+
+                    if (temp == 1)  //если да, то увеличить счетчик точек внутри фигуры
                         insideCounter++;
+                    else {
+                        if (temp == -1) {
+                            Console.WriteLine("not initialized. press any button to exit");
+                            Console.ReadKey();
+
+                            Environment.Exit (-1);
+                        }
+                    }
                 }
 
-                withSquares.Add ( mainFigure_.square_ * insideCounter / n );
+                withSquares.Add ( mainFigure_.square_ * insideCounter / n );    //вычисление площади через формулу по монте карло
             }
 
-            var actuallySquare = BorderFunctions.calculateActualSquare (mainFigure_.leftPoint_);
-            watch.Stop ();
+            var actuallySquare = BorderFunctions.calculateActualSquare (mainFigure_.leftPoint_);    //вычисление настоящей площади
+            watch.Stop ();  //остановка таймера
 
             foreach (var withSquare in withSquares)
-                Console.WriteLine ( $"monte-carlo square = {withSquare}, infelicity = { Math.Abs ( withSquare - actuallySquare ) / actuallySquare}%" );
+                Console.WriteLine ( $"monte-carlo square = {withSquare}, infelicity = { Math.Abs ( withSquare - actuallySquare ) / actuallySquare}%" ); //вывод найденных площадей через монте карло и погрешностей
 
 
-            Console.WriteLine ( $"correct square = {actuallySquare}" );
-            Console.WriteLine ( $"time consumed = {watch.Elapsed}\n\r\n\r" );
+            Console.WriteLine ( $"correct square = {actuallySquare}" ); //вывод настоящей площади
+            Console.WriteLine ( $"time consumed = {watch.Elapsed}\n\r\n\r" );   //и времени
 
             return watch.Elapsed;
         }
     }
 
 
-    class forNonOOP
+    class forNonOOP //там все то же самое, только не в разных классах
     {
         private readonly List<double> withSquares = new List<double> ();
 
@@ -141,8 +153,8 @@ namespace monteKarlo
                 insideCounter = 0;
                 for (var j = 0; j < n; j++)
                 {
-                    randomX = minX_ + ToDouble ( number.Next ( 0, 132767 ) ) / 132767 * (maxX_ - minX_); //minX_ * number.Next (ToInt32 ( minX_ ), ToInt32(maxX_));
-                    randomY = minY_ + ToDouble ( number.Next ( 0, 132767 ) ) / 132767 * (maxY_ - minY_); //number.Next (ToInt32 ( minY_ ), ToInt32(maxY_));
+                    randomX = minX_ + ToDouble ( number.Next ( 0, 132767 ) ) / 132767 * (maxX_ - minX_);
+                    randomY = minY_ + ToDouble ( number.Next ( 0, 132767 ) ) / 132767 * (maxY_ - minY_);
                     if (isInside ( new Point ( randomX, randomY ) ))
                         insideCounter++;
                 }
