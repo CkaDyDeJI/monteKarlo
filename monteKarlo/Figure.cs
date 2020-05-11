@@ -8,11 +8,6 @@ namespace monteKarlo
 {
     class Figure
     {
-
-        public Point leftPoint_ { get; set; }
-        public Point upPoint_ { get; set; }
-        public Point rightPoint_ { get; set; }
-
         public double minY_ { get; set; }
         public double minX_ { get; set; }
         public double maxY_ { get; set; }
@@ -23,25 +18,21 @@ namespace monteKarlo
 
         public Figure(Point leftPoint, Point upPoint, Point rightPoint)
         {
-            leftPoint_ = leftPoint;
-            upPoint_ = upPoint;
-            rightPoint_ = rightPoint;
-
-            setMinsAndMaxs ();
+            setMinsAndMaxs (leftPoint, upPoint, rightPoint );
 
             calculateSquare ();
 
-            BorderFunctions.calculateCircleCenter ( rightPoint_, upPoint_ );    //вычисление линейной фунции по двум точкам
-            BorderFunctions.calculateLinearCoeffs ( leftPoint_, upPoint_ ); //вычисление функции окружности по двум точкам
+            BorderFunctions.calculateCircleCenter ( leftPoint, upPoint );    //вычисление линейной фунции по двум точкам
+            BorderFunctions.calculateLinearCoeffs ( rightPoint, upPoint ); //вычисление функции окружности по двум точкам
         }
 
 
-        private void setMinsAndMaxs ()
+        private void setMinsAndMaxs (Point leftPoint, Point upPoint, Point rightPoint)
         {
-            minX_ = leftPoint_.X;
-            minY_ = leftPoint_.Y;
-            maxX_ = rightPoint_.X;
-            maxY_ = upPoint_.Y;
+            minX_ = leftPoint.X;
+            minY_ = leftPoint.Y;
+            maxX_ = rightPoint.X;
+            maxY_ = upPoint.Y;
         }
 
 

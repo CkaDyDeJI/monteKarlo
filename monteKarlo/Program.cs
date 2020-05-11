@@ -98,7 +98,7 @@ namespace monteKarlo
                 withSquares.Add ( mainFigure_.square_ * insideCounter / n );    //вычисление площади через формулу по монте карло
             }
 
-            var actuallySquare = BorderFunctions.calculateActualSquare (mainFigure_.leftPoint_);    //вычисление настоящей площади
+            var actuallySquare = BorderFunctions.calculateActualSquare (forPoints.leftPoint_);    //вычисление настоящей площади
             watch.Stop ();  //остановка таймера
 
             foreach (var withSquare in withSquares)
